@@ -62,28 +62,27 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public Boolean addScore(Long id, ScoreAddDto scoreAddDto) {
         Student student = studentRepository.findById(id).orElseThrow(StudentNotFoundException::new);
-        return student.addScore(scoreAddDto.getExamName(), scoreAddDto.getScore());
+        Boolean res = student.addScore(scoreAddDto.getExamName(), scoreAddDto.getScore());
+        studentRepository.save(student);
+        return res;
     }
 
     @Override
     public List<StudentDto> findStudentByName(String name) {
-        return StreamSupport.stream(studentRepository.findAll().spliterator(), true)
-                .filter(student -> student.getName().equalsIgnoreCase(name))
+        return studentRepository.findByNameIgnoreCase(name)
                 .map(student -> new StudentDto(student.getId(), student.getName(), student.getScores()))
                 .toList();
     }
 
     @Override
     public Long getStudentQuantityByNames(Set<String> names) {
-        return StreamSupport.stream(studentRepository.findAll().spliterator(), true)
-                .filter(student -> names.contains(student.getName()))
+        return studentRepository.getStudentsByNames(names)
                 .count();
     }
 
     @Override
     public List<StudentDto> findStudentsByExamMinScore(String examName, Integer minScore) {
-        return StreamSupport.stream(studentRepository.findAll().spliterator(), true)
-                .filter(student -> student.getScores().containsKey(examName) && student.getScores().get(examName) >= minScore)
+        return studentRepository.getStudentsByExamMinScore(examName, minScore)
                 .map(student -> new StudentDto(student.getId(), student.getName(), student.getScores()))
                 .toList();
     }
