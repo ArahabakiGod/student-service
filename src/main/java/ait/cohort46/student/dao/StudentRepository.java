@@ -13,6 +13,5 @@ public interface StudentRepository extends CrudRepository<Student, Long> {
     @Query("{'scores.?0': {$gt:  ?1}}")
     Stream<Student> getStudentsByExamMinScore(String examName, Integer minScore);
 
-    @Query("{'name' : {$in: ?0}}")
-    Stream<Student> getStudentsByNames(Set<String> names);
+    Long countByNameInIgnoreCase(Set<String> names);
 }
